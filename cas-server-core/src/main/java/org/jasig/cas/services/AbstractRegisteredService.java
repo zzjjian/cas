@@ -18,6 +18,7 @@
  */
 package org.jasig.cas.services;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -35,6 +36,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.Lob;
+import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -55,6 +57,7 @@ import java.util.Set;
 @DiscriminatorColumn(name = "expression_type", length = 15, discriminatorType = DiscriminatorType.STRING,
                      columnDefinition = "VARCHAR(15) DEFAULT 'ant'")
 @Table(name = "RegisteredServiceImpl")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public abstract class AbstractRegisteredService implements RegisteredService, Comparable<RegisteredService> {
 
     private static final long serialVersionUID = 7645279151115635245L;
@@ -85,7 +88,7 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
      * By default, the policy is {@link RefuseRegisteredServiceProxyPolicy}.
      */
     @Lob
-    @Column(name = "proxy_policy", nullable = false)
+    @Column(name = "proxy_policy", nullable = true)
     private RegisteredServiceProxyPolicy proxyPolicy = new RefuseRegisteredServiceProxyPolicy();
 
     @Column(name = "evaluation_order", nullable = false)
@@ -113,7 +116,7 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
 
     /** The attribute filtering policy. */
     @Lob
-    @Column(name = "attribute_release")
+    @Column(name = "attribute_release", nullable = true)
     private AttributeReleasePolicy attributeReleasePolicy = new ReturnAllowedAttributeReleasePolicy();
 
     @Column(name = "logo")
@@ -123,12 +126,12 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
     private URL logoutUrl;
 
     @Lob
-    @Column(name = "access_strategy")
+    @Column(name = "access_strategy", nullable = true)
     private RegisteredServiceAccessStrategy accessStrategy =
             new DefaultRegisteredServiceAccessStrategy();
 
     @Lob
-    @Column(name = "public_key")
+    @Column(name = "public_key", nullable = true)
     private RegisteredServicePublicKey publicKey;
 
     @Override
@@ -171,6 +174,33 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
         return this.logoutUrl;
     }
 
+    /**
+     * Initializes the registered service with default values
+     * for fields that are unspecified. Only triggered by JPA.
+     * @since 4.1
+     */
+    @PostLoad
+    public final void postLoad() {
+        if (this.proxyPolicy == null) {
+            this.proxyPolicy = new RefuseRegisteredServiceProxyPolicy();
+        }
+        if (this.usernameAttributeProvider == null) {
+            this.usernameAttributeProvider = new DefaultRegisteredServiceUsernameProvider();
+        }
+        if (this.logoutType == null) {
+            this.logoutType = LogoutType.BACK_CHANNEL;
+        }
+        if (this.requiredHandlers == null) {
+            this.requiredHandlers = new HashSet<>();
+        }
+        if (this.accessStrategy == null) {
+            this.accessStrategy = new DefaultRegisteredServiceAccessStrategy();
+        }
+        if (this.attributeReleasePolicy == null) {
+            this.attributeReleasePolicy = new ReturnAllowedAttributeReleasePolicy();
+        }
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (o == null) {
@@ -187,7 +217,8 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
 
         final AbstractRegisteredService that = (AbstractRegisteredService) o;
 
-        return new EqualsBuilder()
+        final EqualsBuilder builder = new EqualsBuilder();
+        return builder
                 .append(this.proxyPolicy, that.proxyPolicy)
                 .append(this.evaluationOrder, that.evaluationOrder)
                 .append(this.description, that.description)
@@ -200,6 +231,8 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
                 .append(this.accessStrategy, that.accessStrategy)
                 .append(this.logo, that.logo)
                 .append(this.publicKey, that.publicKey)
+                .append(this.logoutUrl, that.logoutUrl)
+                .append(this.requiredHandlers, that.requiredHandlers)
                 .isEquals();
     }
 
@@ -218,6 +251,8 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
                 .append(this.accessStrategy)
                 .append(this.logo)
                 .append(this.publicKey)
+                .append(this.logoutUrl)
+                .append(this.requiredHandlers)
                 .toHashCode();
     }
 
@@ -321,6 +356,10 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
         this.setAccessStrategy(source.getAccessStrategy());
         this.setLogo(source.getLogo());
         this.setPublicKey(source.getPublicKey());
+        this.setLogoutUrl(source.getLogoutUrl());
+        this.setPublicKey(source.getPublicKey());
+        this.setRequiredHandlers(source.getRequiredHandlers());
+
     }
 
     /**
@@ -355,6 +394,8 @@ public abstract class AbstractRegisteredService implements RegisteredService, Co
         toStringBuilder.append("publicKey", this.publicKey);
         toStringBuilder.append("proxyPolicy", this.proxyPolicy);
         toStringBuilder.append("logo", this.logo);
+        toStringBuilder.append("logoutUrl", this.logoutUrl);
+        toStringBuilder.append("requiredHandlers", this.requiredHandlers);
 
         return toStringBuilder.toString();
     }

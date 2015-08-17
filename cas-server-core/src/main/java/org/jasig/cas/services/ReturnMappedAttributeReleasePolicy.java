@@ -18,6 +18,10 @@
  */
 package org.jasig.cas.services;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,8 +36,24 @@ public class ReturnMappedAttributeReleasePolicy extends AbstractAttributeRelease
 
     private static final long serialVersionUID = -6249488544306639050L;
     
-    private Map<String, String> allowedAttributes = new TreeMap<>();
-    
+    private Map<String, String> allowedAttributes;
+
+    /**
+     * Instantiates a new Return mapped attribute release policy.
+     */
+    public ReturnMappedAttributeReleasePolicy() {
+        this(new TreeMap<String, String>());
+    }
+
+    /**
+     * Instantiates a new Return mapped attribute release policy.
+     *
+     * @param allowedAttributes the allowed attributes
+     */
+    public ReturnMappedAttributeReleasePolicy(final Map<String, String> allowedAttributes) {
+        this.allowedAttributes = allowedAttributes;
+    }
+
     /**
      * Sets the allowed attributes.
      *
@@ -48,7 +68,7 @@ public class ReturnMappedAttributeReleasePolicy extends AbstractAttributeRelease
      *
      * @return the allowed attributes
      */
-    protected Map<String, String> getAllowedAttributes() {
+    public Map<String, String> getAllowedAttributes() {
         return new TreeMap<String, String>(this.allowedAttributes);
     }
     
@@ -68,5 +88,40 @@ public class ReturnMappedAttributeReleasePolicy extends AbstractAttributeRelease
             }
         }
         return attributesToRelease;
+    }
+
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        final ReturnMappedAttributeReleasePolicy rhs = (ReturnMappedAttributeReleasePolicy) obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(this.allowedAttributes, rhs.allowedAttributes)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(allowedAttributes)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("allowedAttributes", allowedAttributes)
+                .toString();
     }
 }

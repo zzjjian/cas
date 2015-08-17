@@ -20,31 +20,30 @@
 package org.jasig.cas.support.saml.util;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.jasig.cas.authentication.principal.WebApplicationService;
 import org.jasig.cas.support.saml.authentication.principal.SamlService;
 import org.jasig.cas.util.CompressionUtils;
 import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Audience;
-import org.opensaml.saml2.core.AudienceRestriction;
-import org.opensaml.saml2.core.AuthnContext;
-import org.opensaml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.NameID;
-import org.opensaml.saml2.core.Response;
-import org.opensaml.saml2.core.Status;
-import org.opensaml.saml2.core.StatusCode;
-import org.opensaml.saml2.core.StatusMessage;
-import org.opensaml.saml2.core.Subject;
-import org.opensaml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml2.core.SubjectConfirmationData;
-import org.springframework.util.StringUtils;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.AuthnContext;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.saml.saml2.core.StatusCode;
+import org.opensaml.saml.saml2.core.StatusMessage;
+import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 
 import java.security.SecureRandom;
-
 
 /**
  * This is {@link AbstractSaml20ObjectBuilder}.
@@ -87,8 +86,9 @@ public abstract class AbstractSaml20ObjectBuilder extends AbstractSamlObjectBuil
         if (service instanceof SamlService) {
             final SamlService samlService = (SamlService) service;
 
-            if (samlService.getRequestID() != null) {
-                samlResponse.setInResponseTo(samlService.getRequestID());
+            final String requestId = samlService.getRequestID();
+            if (StringUtils.isNotBlank(requestId)) {
+                samlResponse.setInResponseTo(requestId);
             }
         }
         return samlResponse;
@@ -106,7 +106,7 @@ public abstract class AbstractSaml20ObjectBuilder extends AbstractSamlObjectBuil
         final StatusCode code = newSamlObject(StatusCode.class);
         code.setValue(codeValue);
         status.setStatusCode(code);
-        if (StringUtils.hasText(statusMessage)) {
+        if (StringUtils.isNotBlank(statusMessage)) {
             final StatusMessage message = newSamlObject(StatusMessage.class);
             message.setMessage(statusMessage);
             status.setStatusMessage(message);

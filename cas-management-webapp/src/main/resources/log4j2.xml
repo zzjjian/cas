@@ -29,8 +29,8 @@
     <Loggers>
         <Logger name="org.springframework" level="warn" />
         <Logger name="org.springframework.webflow" level="warn" />
-        <Logger name="org.springframework.web" level="warn" />
-        <Logger name="org.springframework.security" level="warn" />
+        <Logger name="org.springframework.web" level="debug" />
+        <Logger name="org.springframework.security" level="debug" />
 
         <Logger name="org.jasig" level="debug" additivity="false">
             <AppenderRef ref="console"/>

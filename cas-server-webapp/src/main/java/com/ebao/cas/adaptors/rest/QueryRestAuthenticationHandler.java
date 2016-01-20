@@ -62,7 +62,7 @@ public class QueryRestAuthenticationHandler extends AbstractUsernamePasswordAuth
 	@NotNull
 	private String requestUrl;
 
-	private String userUrl = "/restlet/v1/public/system/login";
+	private final String userUrl = "/restlet/v1/public/system/login";
 
 	private Map<String, Object> maps;
 

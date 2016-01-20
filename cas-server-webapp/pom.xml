@@ -45,6 +45,19 @@
         </exclusions>
     </dependency>
     <dependency>
+    	<groupId>org.jasig.cas</groupId>
+    	<artifactId>cas-server-support-oauth</artifactId>
+    	<version>4.1.1</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>org.jasig.cas</groupId>
+    	<artifactId>cas-server-support-rest</artifactId>
+    	<version>4.1.1</version>
+    </dependency>
+    
+    
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-expression</artifactId>
       <scope>runtime</scope>

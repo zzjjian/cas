@@ -118,6 +118,7 @@
         <prop key="/samlValidate">samlValidateController</prop>
         -->
 
+				<prop key="/oauth2.0/*">oauth20WrapperController</prop>
         <prop key="/p3/serviceValidate">v3ServiceValidateController</prop>
         <prop key="/p3/proxyValidate">v3ProxyValidateController</prop>
         <prop key="/validate">legacyValidateController</prop>
@@ -351,4 +352,12 @@
           p:successView="casSamlServiceSuccessView"
           p:failureView="casSamlServiceFailureView"/>
   -->
+  <bean
+  id="oauth20WrapperController"
+  class="org.jasig.cas.support.oauth.web.OAuth20WrapperController"
+  p:loginUrl="@cas_login_url@"
+  p:servicesManager-ref="servicesManager"
+  p:ticketRegistry-ref="ticketRegistry"
+  p:timeout="7200" />
+  
 </beans>

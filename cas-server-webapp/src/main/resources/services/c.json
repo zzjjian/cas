@@ -1,0 +1,10 @@
+ {
+    "@class" : "org.jasig.cas.support.oauth.services.OAuthRegisteredService",
+		"id" : "1",
+		"name" : "serviceName", 
+		"description" : "Service Description", 
+		"serviceId" : "http://.+",
+		"bypassApprovalPrompt" : "true", 
+		"clientId" : "key",
+		"clientSecret" : "secret"
+ }

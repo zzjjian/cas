@@ -56,12 +56,24 @@
     	<version>4.1.1</version>
     </dependency>
     
+    <dependency>
+    	<groupId>org.jasig.cas</groupId>
+    	<artifactId>cas-server-support-jdbc</artifactId>
+    	<version>4.1.1</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>org.jasig.cas</groupId>
+    	<artifactId>cas-server-integration-restlet</artifactId>
+    	<version>4.1.1</version>
+    </dependency>
     
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-expression</artifactId>
       <scope>runtime</scope>
     </dependency>
+    
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>

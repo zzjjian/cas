@@ -53,16 +53,9 @@
        +-->
     <bean id="authenticationManager" class="org.jasig.cas.authentication.PolicyBasedAuthenticationManager">
         <constructor-arg>
-            <map>
-                <!--
-                   | IMPORTANT
-                   | Every handler requires a unique name.
-                   | If more than one instance of the same handler class is configured, you must explicitly
-                   | set its name to something other than its default name (typically the simple class name).
-                   -->
-                <entry key-ref="proxyAuthenticationHandler" value-ref="proxyPrincipalResolver" />
-                <entry key-ref="primaryAuthenticationHandler" value-ref="primaryPrincipalResolver" />
-            </map>
+		<list>
+			<ref bean="primaryAuthenticationHandler"/>
+		</list>
         </constructor-arg>
 
         <!-- Uncomment the metadata populator to capture the password.
@@ -102,14 +95,65 @@
        | * org.jasig.cas.adaptors.x509.authentication.handler.support.X509CredentialsAuthenticationHandler
        | * org.jasig.cas.support.spnego.authentication.handler.support.JCIFSSpnegoAuthenticationHandler
        -->
+<!--       
     <bean id="primaryAuthenticationHandler"
           class="org.jasig.cas.authentication.AcceptUsersAuthenticationHandler">
         <property name="users">
             <map>
-                <entry key="casuser" value="Mellon"/>
+                <entry key="andy" value="eBao1234"/>
+		<entry key="demo" value="eBao1234"/>
             </map>
         </property>
     </bean>
+-->
+<!-- 
+	<bean id="primaryAuthenticationHandler" class="org.jasig.cas.adaptors.jdbc.QueryRestAuthenticationHandler">
+		<property name="requestUrl" value="@pa_login_url@"/>
+	</bean>
+ -->		
+
+
+    <bean id="primaryAuthenticationHandler"
+          class="com.ebao.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">
+        <property name="sql" value="select PASSWORD,USER_ID from t_pub_user where USER_NAME=?"/>    
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+	
+	<!--
+	<bean id="passwordEncoder" class="com.ebao.unicorn.platform.foundation.security.PlainTextPasswordEncoder"/>
+	-->
+	
+	
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+	<!-- 
+		<property name="url" value="jdbc:oracle:thin:@172.25.14.22:1521:g22u1" />
+		<property name="username" value="UNICORN_DEV" />
+		<property name="password" value="UNICORN_DEVpwd" />
+	 -->
+	 
+	 	<property name="url" value="@db_url@" />
+		<property name="username" value="@db_username@" />
+		<property name="password" value="@db_pwd@" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testOnReturn" value="false" />
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="validationInterval" value="30000" />
+		<property name="timeBetweenEvictionRunsMillis" value="30000"/>
+		<property name="maxActive" value="100"/>
+		<property name="minIdle" value="10" />
+		<property name="maxWait" value="10000" />
+		<property name="initialSize" value="10" />
+		<property name="removeAbandonedTimeout" value="60" />
+		<property name="removeAbandoned" value="true" />
+		<property name="logAbandoned" value="true"/>
+		<property name="minEvictableIdleTimeMillis" value="30000"/>
+		<property name="jmxEnabled" value="true"/>
+		<property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+            org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" />   
+	</bean>
+
 
     <!-- Required for proxy ticket mechanism -->
     <bean id="proxyPrincipalResolver"
@@ -132,6 +176,7 @@
           p:backingMap-ref="attrRepoBackingMap" />
 
     <util:map id="attrRepoBackingMap">
+    		<entry key="client_id" value="key" />
         <entry key="uid" value="uid" />
         <entry key="eduPersonAffiliation" value="eduPersonAffiliation" />
         <entry key="groupMembership" value="groupMembership" />
@@ -146,7 +191,7 @@
     </util:map>
 
     <bean id="serviceRegistryDao" class="org.jasig.cas.services.JsonServiceRegistryDao"
-          c:configDirectory="${service.registry.config.location:classpath:services}" />
+          c:configDirectory="classpath:services" />
 
     <bean id="auditTrailManager" class="org.jasig.inspektr.audit.support.Slf4jLoggingAuditTrailManager" />
 

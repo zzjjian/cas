@@ -37,6 +37,7 @@
   | The base-package indicates where components stored. Spring will scan this
   | folder and find out the annotated beans and register it in Spring container.
   -->
+  <context:component-scan base-package="com.ebao.cas" />
   <context:component-scan base-package="org.jasig.cas" />
   <context:annotation-config/>
 
@@ -138,6 +139,7 @@
   </bean>
 
   <bean id="passThroughController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+  
 
   <!-- login webflow configuration -->
   <bean id="loginFlowHandlerMapping" class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping"
@@ -308,6 +310,7 @@
         p:warnCookieGenerator-ref="warnCookieGenerator"/>
 
   <bean id="authenticationExceptionHandler" class="org.jasig.cas.web.flow.AuthenticationExceptionHandler" />
+  
 
   <bean id="generateServiceTicketAction" class="org.jasig.cas.web.flow.GenerateServiceTicketAction"
         p:centralAuthenticationService-ref="centralAuthenticationService"/>
@@ -359,5 +362,7 @@
   p:servicesManager-ref="servicesManager"
   p:ticketRegistry-ref="ticketRegistry"
   p:timeout="7200" />
-  
+<!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>     -->
+<!--Spring3.1开始的注解 HandlerAdapter -->    
+<!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>    -->
 </beans>

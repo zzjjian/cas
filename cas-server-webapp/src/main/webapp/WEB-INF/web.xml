@@ -80,6 +80,10 @@
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/statistics/*</url-pattern>
     </filter-mapping>
+      <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/changePwd/*</url-pattern>
+    </filter-mapping>
 
     <!--
       - Loads the CAS ApplicationContext.
@@ -204,6 +208,7 @@
         <url-pattern>/status/config</url-pattern>
     </servlet-mapping>
 
+ 
     <servlet-mapping>
         <servlet-name>metrics-ping</servlet-name>
         <url-pattern>/statistics/ping</url-pattern>
@@ -233,6 +238,17 @@
         <servlet-name>cas</servlet-name>
         <url-pattern>/v1/*</url-pattern>
     </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>cas</servlet-name>
+        <url-pattern>/changePwd/save</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>cas</servlet-name>
+        <url-pattern>/changePwd/check</url-pattern>
+    </servlet-mapping>
+    
 
     <!--
     <servlet-mapping>

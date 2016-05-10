@@ -115,26 +115,24 @@
 
     <bean id="primaryAuthenticationHandler"
           class="com.ebao.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">
-        <property name="sql" value="select PASSWORD,USER_ID from t_pub_user where USER_NAME=?"/>    
+        <property name="sql" value="select PASSWORD,USER_ID,STATUS,USER_DISABLE,NEED_CHANGE_PASS,PASSWORD_CHANGE,INVALID_LOGIN from t_pub_user where USER_NAME=?"/>    
         <property name="dataSource" ref="dataSource"/>
+        <property name="passwordEncrypt" ref="passwordEncrypt"/>
     </bean>
 	
 	<!--
 	<bean id="passwordEncoder" class="com.ebao.unicorn.platform.foundation.security.PlainTextPasswordEncoder"/>
 	-->
 	
-	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
 	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
-		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
-	<!-- 
-		<property name="url" value="jdbc:oracle:thin:@172.25.14.22:1521:g22u1" />
-		<property name="username" value="UNICORN_DEV" />
-		<property name="password" value="UNICORN_DEVpwd" />
-	 -->
-	 
-	 	<property name="url" value="@db_url@" />
-		<property name="username" value="@db_username@" />
-		<property name="password" value="@db_pwd@" />
+	 	<property name="url" value="${db_url}" />
+		<property name="username" value="${db_username}" />
+		<property name="password" value="${db_pwd}" />
+		<property name="driverClassName" value="${driverClassName}" />
+		
 		<property name="testWhileIdle" value="true" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testOnReturn" value="false" />
@@ -151,7 +149,7 @@
 		<property name="minEvictableIdleTimeMillis" value="30000"/>
 		<property name="jmxEnabled" value="true"/>
 		<property name="jdbcInterceptors" value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
-            org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" />   
+         org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" /> 
 	</bean>
 
 
@@ -211,4 +209,8 @@
               p:serviceTicketCountWarnThreshold="5000"
               p:sessionCountWarnThreshold="100000" />
     </util:list>
+    <bean id="passwordEncrypt" class="com.ebao.cas.encrypt.PasswordEncrypt">
+	 <property name="salt2" value="${salt2}" />
+     <property name="algorithm" value="${algorithm}"/>
+    </bean>
 </beans>

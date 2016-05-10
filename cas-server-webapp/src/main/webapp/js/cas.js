@@ -15,12 +15,22 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
+ *  "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
+ *  //var scripts = ["/jquery-1.12.3.min.js",
+//    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js",
+//    "https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js",
+//    "https://rawgithub.com/cowboy/javascript-debug/master/ba-debug.min.js"];
+var scripts = ["https://cdn.bootcss.com/jquery/1.12.0/jquery.min.js",
+               "https://cdn.bootcss.com/jqueryui/1.11.4/jquery-ui.min.js",
+               "https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js",
+               "https://rawgithub.com/cowboy/javascript-debug/master/ba-debug.min.js"];
 
-var scripts = [ "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js",
-    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js",
-    "https://rawgithub.com/cowboy/javascript-debug/master/ba-debug.min.js"];
+ */
+var scripts = [ "/cas-server/js/jquery.min.js",
+    "/cas-server/js/jquery-ui.min.js",
+    "/cas-server/js/jquery.cookie.min.js",
+    "/cas-server/js/ba-debug.min.js"];
+
 
 head.ready(document, function() {
     head.load(scripts, resourceLoadedSuccessfully);

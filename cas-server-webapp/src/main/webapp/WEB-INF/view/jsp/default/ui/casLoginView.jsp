@@ -20,19 +20,21 @@
 --%>
 <jsp:directive.include file="includes/top.jsp" />
 
+<!--
 <c:if test="${not pageContext.request.secure}">
     <div id="msg" class="errors">
         <h2><spring:message code="screen.nonsecure.title" /></h2>
         <p><spring:message code="screen.nonsecure.message" /></p>
     </div>
 </c:if>
-
+-->
+<!--
 <div id="cookiesDisabled" class="errors" style="display:none;">
     <h2><spring:message code="screen.cookies.disabled.title" /></h2>
     <p><spring:message code="screen.cookies.disabled.message" /></p>
 </div>
-
-
+-->
+<!--
 <c:if test="${not empty registeredService}">
     <c:set var="registeredServiceLogo" value="images/webapp.png"/>
     <c:set var="registeredServiceName" value="${registeredService.name}"/>
@@ -64,13 +66,15 @@
     </div>
     <p/>
 </c:if>
-
+-->
 <div class="box" id="login">
     <form:form method="post" id="fm1" commandName="${commandName}" htmlEscape="true">
 
-        <form:errors path="*" id="msg" cssClass="errors" element="div" htmlEscape="false" />
-
+        
+<!--
         <h2><spring:message code="screen.welcome.instructions" /></h2>
+-->
+				<img src="./images/Slogo.png" />
 
         <section class="row">
             <label for="username"><spring:message code="screen.welcome.label.netid" /></label>
@@ -122,14 +126,31 @@
             <input class="btn-submit" name="submit" accesskey="l" value="<spring:message code="screen.welcome.button.login" />" tabindex="6" type="submit" />
             <input class="btn-reset" name="reset" accesskey="c" value="<spring:message code="screen.welcome.button.clear" />" tabindex="7" type="reset" />
         </section>
+        <form:errors path="*" id="msg" cssClass="errors" element="div" htmlEscape="false" />
     </form:form>
 </div>
+
+<div id="sidebar">
+    <div class="sidebar-content">
+			
+
+		<img src="./images/ebaotech_Client_background.png" />
+
+		
+    </div>
+</div>
+
+
+<!--
 
 <div id="sidebar">
     <div class="sidebar-content">
         <p><spring:message code="screen.welcome.security" /></p>
 
         <div id="list-languages">
+        	
+
+
             <%final String queryString = request.getQueryString() == null ? "" : request.getQueryString().replaceAll("&locale=([A-Za-z][A-Za-z]_)?[A-Za-z][A-Za-z]|^locale=([A-Za-z][A-Za-z]_)?[A-Za-z][A-Za-z]", "");%>
             <c:set var='query' value='<%=queryString%>' />
             <c:set var="xquery" value="${fn:escapeXml(query)}" />
@@ -201,3 +222,4 @@
 </div>
 
 <jsp:directive.include file="includes/bottom.jsp" />
+-->

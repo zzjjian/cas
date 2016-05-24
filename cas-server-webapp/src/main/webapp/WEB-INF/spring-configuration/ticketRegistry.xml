@@ -23,29 +23,107 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:c="http://www.springframework.org/schema/c"
        xmlns="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+       										 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       										 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+													 http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
     <description>
         Configuration for the default TicketRegistry which stores the tickets in-memory and cleans them out as specified
         intervals.
     </description>
 
     <!-- Ticket Registry -->
-    <bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.DefaultTicketRegistry"/>
 
-    <!--Quartz -->
-    <!-- TICKET REGISTRY CLEANER -->
-    <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner"
-          c:centralAuthenticationService-ref="centralAuthenticationService"
-          c:ticketRegistry-ref="ticketRegistry"/>
+<bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.JpaTicketRegistry" />
 
-    <bean id="jobDetailTicketRegistryCleaner"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
-          p:targetObject-ref="ticketRegistryCleaner"
-          p:targetMethod="clean"/>
+<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
 
-    <bean id="triggerJobDetailTicketRegistryCleaner"
-          class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean"
-          p:jobDetail-ref="jobDetailTicketRegistryCleaner"
-          p:startDelay="20000"
-          p:repeatInterval="5000000"/>
+<util:list id="packagesToScan">
+    <value>org.jasig.cas.ticket</value>
+    <value>org.jasig.cas.adaptors.jdbc</value>
+</util:list>
+
+<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+      id="jpaVendorAdapter"
+      p:generateDdl="true"
+      p:showSql="true" />
+
+<bean id="entityManagerFactory"
+      class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+      p:dataSource-ref="dataSource"
+      p:jpaVendorAdapter-ref="jpaVendorAdapter"
+      p:packagesToScan-ref="packagesToScan">
+    <property name="jpaProperties">
+        <props>
+            <prop key="hibernate.dialect">${hibernate_dialect}</prop>
+            <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+            <prop key="hibernate.jdbc.batch_size">10</prop>
+        </props>
+    </property>
+</bean>
+
+<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+      p:entityManagerFactory-ref="entityManagerFactory" />
+
+<tx:advice id="txRegistryAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+    	  <tx:method name="deleteTicket" read-only="false" />
+        <tx:method name="addTicket" read-only="false" />
+        <tx:method name="updateTicket" read-only="false" />
+        <tx:method name="getTicket" read-only="true" />
+        <tx:method name="getTickets" read-only="true" />
+        <tx:method name="add*" read-only="false"/>
+        <tx:method name="delete*" read-only="false"/>
+        <tx:method name="save*" read-only="false"/>
+        <tx:method name="update*" read-only="false"/>
+        <tx:method name="get*" read-only="true"/>
+        <tx:method name="grant*" read-only="false"/>
+        <tx:method name="validate*" read-only="true"/>
+        <tx:method name="sessionCount" read-only="true" />
+        <tx:method name="serviceTicketCount" read-only="true" />
+    </tx:attributes>
+</tx:advice>
+
+<tx:advice id="txRegistryLockingAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <tx:method name="getOwner" read-only="true" />
+        <tx:method name="acquire" read-only="false" />
+        <tx:method name="release" read-only="false" />
+    </tx:attributes>
+</tx:advice>
+
+<aop:config>
+    <aop:pointcut id="ticketRegistryOperations" expression="execution(* org.jasig.cas.ticket.registry.JpaTicketRegistry.*(..))"/>
+    <aop:pointcut id="ticketRegistryLockingOperations" expression="execution(* org.jasig.cas.ticket.registry.support.JpaLockingStrategy.*(..))"/>
+    <aop:pointcut id="centralAuthenticationServiceOperations" expression="execution(* org.jasig.cas.CentralAuthenticationService.*(..))"/>
+    <aop:advisor advice-ref="txRegistryAdvice" pointcut-ref="ticketRegistryOperations"/>
+    <aop:advisor advice-ref="txRegistryLockingAdvice" pointcut-ref="ticketRegistryLockingOperations"/>
+    <aop:advisor advice-ref="txRegistryAdvice" pointcut-ref="centralAuthenticationServiceOperations"/>
+</aop:config>
+
+
+<bean id="ticketRegistryCleaner"
+      class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner"
+      c:centralAuthenticationService-ref="centralAuthenticationService"
+      c:ticketRegistry-ref="ticketRegistry"
+      p:lock-ref="cleanerLock"/>
+
+<bean id="cleanerLock" class="org.jasig.cas.ticket.registry.support.JpaLockingStrategy"
+      p:uniqueId="${host.name}"
+      p:applicationId="cas-ticket-registry-cleaner" />
+
+<bean id="jobDetailTicketRegistryCleaner"
+      class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+      p:targetObject-ref="ticketRegistryCleaner"
+      p:targetMethod="clean" />
+
+<bean id="triggerJobDetailTicketRegistryCleaner"
+      class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean"
+      p:jobDetail-ref="jobDetailTicketRegistryCleaner"
+      p:startDelay="20000"
+      p:repeatInterval="5000000" />
+
 </beans>

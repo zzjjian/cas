@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -65,9 +66,13 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
     private String disableSql="update  T_PUB_USER set STATUS='N' where user_id=?";
     private String addSql="update  T_PUB_USER set INVALID_LOGIN = INVALID_LOGIN+1 where user_id=?";
     private String resetSql="update  T_PUB_USER set INVALID_LOGIN = 0 where user_id=?";
-    private String configDay="select para_value from T_PUB_PARA_DEF where para_id = 1178811";
+    private String configDay="select para_value from T_PUB_PARA_DEF where para_id = ?";
     private String pwdSql="update  T_PUB_USER set NEED_CHANGE_PASS = ? where user_id=?";
     private PasswordEncrypt passwordEncrypt;
+    private final static Long PASSWORD_CHECK_DAY_DEFUAL = 90L;
+    private final static Long INVALID_LOGIN_TIMES_DEFUAL = 5L;
+    private final static Long PASSWORD_CHECK_DAY_ID = 1178811L;
+    private final static Long INVALID_LOGIN_TIMES_ID = 1178812L;
     private static final Logger logger = LoggerFactory.getLogger(QueryRestAuthenticationHandler.class);
     /**
      * {@inheritDoc}
@@ -95,7 +100,8 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
             	logger.error("This account has been disabled");
                 throw new AccountDisabledException("This account has been disabled");
             }
-            if(3<= Long.parseLong(invalid)){
+            Long dbconfig = getConfigParaById(INVALID_LOGIN_TIMES_ID)==null?INVALID_LOGIN_TIMES_DEFUAL:getConfigParaById(INVALID_LOGIN_TIMES_ID);
+            if(dbconfig<= Long.parseLong(invalid)){
             	logger.error("This account has been disabled");
             	disableUser(Long.valueOf(uid));
             	throw new AccountDisabledException("This account has been disabled");
@@ -152,10 +158,11 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 		if ("1".equals(neddFlage)) {
 			return false;
 		}
-		Long dbcongig =getJdbcTemplate().queryForObject(configDay,Long.class);
+		Long dbconfig = getConfigParaById(PASSWORD_CHECK_DAY_DEFUAL)==null?PASSWORD_CHECK_DAY_ID:getConfigParaById(PASSWORD_CHECK_DAY_DEFUAL);
+//		Long dbcongig =getJdbcTemplate().queryForObject(configDay,Long.class);
 		if (startDate != null) {
 			double bd = getBetweenDays(startDate, new Date());
-			if (bd > dbcongig) {
+			if (bd > dbconfig) {
 				 getJdbcTemplate().update(pwdSql,new Long[]{1l,userId});
 				return false;
 			}
@@ -167,6 +174,16 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 		double result = 0;
 		result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
 		return result;
+	}
+	private Long getConfigParaById(Long id){
+		List<Map<String, Object>> dbList = getJdbcTemplate().queryForList(configDay, id);
+		Map<String, Object> map = new HashMap<String, Object>();
+		Long dbconfig = null;
+		if(dbList.size()>0){
+			map = dbList.get(0);
+			dbconfig = new Long((String)map.get("para_value"));
+		}
+		return dbconfig;
 	}
 
 	public String getDisableSql() {

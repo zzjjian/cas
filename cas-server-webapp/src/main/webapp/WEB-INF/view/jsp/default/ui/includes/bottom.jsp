@@ -19,7 +19,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
 </div> 
 
 <footer>
@@ -30,7 +30,11 @@
 </footer>
 
 </div> 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/head.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/ba-debug.min.js"></script>
 <spring:theme code="cas.javascript.file" var="casJavascriptFile" text="" />
 <script type="text/javascript" src="<c:url value="${casJavascriptFile}" />"></script>
 </body>

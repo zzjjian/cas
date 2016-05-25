@@ -10,6 +10,7 @@ public class JdbcUsernamePasswordCredential extends UsernamePasswordCredential{
 	private String oldpassword;
 	private String newpassword;
 	private String confirmpassword;
+	private String loginUrl;
 	public JdbcUsernamePasswordCredential(){
 		
 	}
@@ -30,6 +31,12 @@ public class JdbcUsernamePasswordCredential extends UsernamePasswordCredential{
 	}
 	public void setConfirmpassword(String confirmpassword) {
 		this.confirmpassword = confirmpassword;
+	}
+	public String getLoginUrl() {
+		return loginUrl;
+	}
+	public void setLoginUrl(String loginUrl) {
+		this.loginUrl = loginUrl;
 	}
 	
 	

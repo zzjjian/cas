@@ -47,6 +47,7 @@ public class ChangePwdController {
 	protected ModelAndView handleRequestInternal(final HttpServletRequest request, final HttpServletResponse response,
 			JdbcUsernamePasswordCredential credential) throws Exception {
 		ModelAndView mav = new ModelAndView("default/ui/casExpiredPassView");
+		
 		final String encryptedOldPassword = passwordEncrypt.encrypt(credential.getUsername(), credential.getOldpassword());
 		credential.setOldpassword(encryptedOldPassword);
 		mav.addObject("credential", credential);
@@ -70,7 +71,9 @@ public class ChangePwdController {
 		credential.setNewpassword(encryptedNewPassword);
 		saveUserMessage(credential);
 		comparePwdSave(credential);
-		mav.setViewName("cas/login");
+		System.out.println("handleRequestInternal**************"+"redirect:"+credential.getLoginUrl());
+		mav = new ModelAndView("redirect:"+credential.getLoginUrl());
+
 		return mav;
 	}
 
@@ -99,7 +102,7 @@ public class ChangePwdController {
 
 	private void saveUserMessage(JdbcUsernamePasswordCredential credential) {
 		
-		jdbcTemplate.update(UpdatePwdsql, new Object[] { credential.getNewpassword(), new Date(), 1, credential.getUsername() });
+		jdbcTemplate.update(UpdatePwdsql, new Object[] { credential.getNewpassword(), new Date(), 0, credential.getUsername() });
 	}
 
 	private boolean comparePwdCheck(JdbcUsernamePasswordCredential credential) throws JsonParseException, JsonMappingException, IOException {

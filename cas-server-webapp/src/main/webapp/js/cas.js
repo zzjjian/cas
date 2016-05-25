@@ -26,10 +26,7 @@ var scripts = ["https://cdn.bootcss.com/jquery/1.12.0/jquery.min.js",
                "https://rawgithub.com/cowboy/javascript-debug/master/ba-debug.min.js"];
 
  */
-var scripts = [ "/cas-server/js/jquery.min.js",
-    "/cas-server/js/jquery-ui.min.js",
-    "/cas-server/js/jquery.cookie.min.js",
-    "/cas-server/js/ba-debug.min.js"];
+var scripts = [];
 
 
 head.ready(document, function() {

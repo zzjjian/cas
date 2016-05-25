@@ -34,7 +34,7 @@ function comparePassword(){
 	    var patt1=new RegExp(filter);
 		$.ajax( {   
 	    type : "POST",   
-	    url : "/cas-server/changePwd/check", 
+	    url : "${pageContext.request.contextPath}/changePwd/check", 
 	    contentType: "application/json; charset=utf-8",  
 	    data : JSON.stringify(user),  
 	    dataType: "json",   
@@ -95,14 +95,14 @@ function onSubmitUser(){
 	}
 	$("#msg").html("");
 	$("#msg").hide();
-	$("#passwordForm").action="/cas-server/changePwd/save"; 
+	$("#passwordForm").action="${pageContext.request.contextPath}/changePwd/save"; 
 	$("#passwordForm").submit();
 	
 }
 </script>
 <div class="box" id="login">
 
-    <form:form method="post" id="passwordForm" action="/cas-server/changePwd/save" commandName="credential" htmlEscape="true">
+    <form:form method="post" id="passwordForm" action="${pageContext.request.contextPath}/changePwd/save" commandName="credential" htmlEscape="true">
 		<h2><spring:message code="screen.expiredpass.heading" /></h2>
 		  <c:if test="${not empty error}">
 		  	<div id="msgError" class="errors">
@@ -129,7 +129,7 @@ function onSubmitUser(){
             <spring:message code="screen.welcome.label.password.accesskey" var="passwordAccessKey" />
             <form:password cssClass="required" cssErrorClass="error" id="confirmpassword" name="confirmpassword" size="25" tabindex="2" path="confirmpassword"  accesskey="${passwordAccessKey}" htmlEscape="true" autocomplete="off" />
         </section>
-        
+        <form:input  type="hidden" cssClass="required" cssErrorClass="error" id="loginUrl" size="25" tabindex="1" accesskey="${loginUrlAccessKey}" path="loginUrl" autocomplete="off" htmlEscape="true" />
         
         <section class="row btn-row">
             <input class="btn-submit" id="submit_user" name="submit_user" accesskey="l" onclick="onSubmitUser()" value="<spring:message code="screen.welcome.button.submit" />" tabindex="6" type="button" />
@@ -139,3 +139,8 @@ function onSubmitUser(){
 </div>
 
 <jsp:directive.include file="includes/bottom.jsp" />
+
+<script type="text/javascript">
+if(document.getElementById('loginUrl').value == null || document.getElementById('loginUrl').value=="")
+	document.getElementById('loginUrl').value=window.location.href
+</script>

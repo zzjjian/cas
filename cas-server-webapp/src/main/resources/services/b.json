@@ -3,5 +3,5 @@
 		"id" : "0",
 		"name" : "HTTP", 
 		"description" : "http://localhost:8080/", 
-		"serviceId" : "@cas_url@/oauth2.0/callbackAuthorize"
+		"serviceId" : "@CAS_URL@/oauth2.0/callbackAuthorize"
  }

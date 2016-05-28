@@ -63,11 +63,11 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 
     @NotNull
     private String sql;
-    private String disableSql="update  T_PUB_USER set STATUS='N' where user_id=?";
-    private String addSql="update  T_PUB_USER set INVALID_LOGIN = INVALID_LOGIN+1 where user_id=?";
-    private String resetSql="update  T_PUB_USER set INVALID_LOGIN = 0 where user_id=?";
-    private String configDay="select para_value from T_PUB_PARA_DEF where para_id = ?";
-    private String pwdSql="update  T_PUB_USER set NEED_CHANGE_PASS = ? where user_id=?";
+    private String disableSql="UPDATE  T_PUB_USER SET STATUS='N' WHERE USER_ID=?";
+    private String addSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = INVALID_LOGIN+1 WHERE USER_ID=?";
+    private String resetSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = 0 WHERE USER_ID=?";
+    private String configDay="SELECT PARA_VALUE FROM T_PUB_PARA_DEF WHERE PARA_ID = ?";
+    private String pwdSql="UPDATE  T_PUB_USER SET NEED_CHANGE_PASS = ? WHERE USER_ID=?";
     private PasswordEncrypt passwordEncrypt;
     private final static Long PASSWORD_CHECK_DAY_DEFUAL = 90L;
     private final static Long INVALID_LOGIN_TIMES_DEFUAL = 5L;

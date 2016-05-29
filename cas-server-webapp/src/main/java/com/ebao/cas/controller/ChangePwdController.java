@@ -33,7 +33,7 @@ public class ChangePwdController {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
-	private PasswordEncrypt passwordEncrypt;
+	private PasswordEncrypt passwordEncrypt; 
 	private String checkPwdsql = "SELECT COUNT(1) NUM FROM T_PUB_USER WHERE USER_NAME=? AND PASSWORD=? ";
 	private String UpdatePwdsql = "UPDATE  T_PUB_USER SET PASSWORD=? ,PASSWORD_CHANGE=? ,NEED_CHANGE_PASS=? WHERE USER_NAME=?";
 	private String getUserIdsql = "SELECT T.USER_ID,(SELECT T.USER_ID FROM  T_PUB_USER_PASSWORD T1 WHERE T1.USER_ID = T.USER_ID)PUSER_ID FROM T_PUB_USER T WHERE T.USER_NAME = ?";

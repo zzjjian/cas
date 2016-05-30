@@ -33,20 +33,21 @@ public class ChangePwdController {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
-	private PasswordEncrypt passwordEncrypt;
-	private String checkPwdsql = "select count(*) num from T_PUB_USER where User_Name=? and PassWord=? ";
-	private String UpdatePwdsql = "update  T_PUB_USER set PassWord=? ,PASSWORD_CHANGE=? ,NEED_CHANGE_PASS=? where User_Name=?";
-	private String getUserIdsql = "select t.user_id,(select t.User_Id from  T_PUB_USER_PASSWORD t1 where t1.user_id = t.user_id)PUSER_ID from T_PUB_USER t where t.user_name = ?";
-	private String updateCheckPwdSql ="update T_PUB_USER_PASSWORD set PASS_WORD=?,UPDATE_BY=?,UPDATE_TIME=? where USER_ID=?";
-	private String insertUPSql="insert into T_PUB_USER_PASSWORD (UP_ID,PASS_WORD,USER_ID,INSERT_BY,INSERT_TIME,UPDATE_BY,UPDATE_TIME) values (?,?,?,?,?,?,?)";
-	private String getSeqId = "select t.next_val from T_PUB_SEQUENCE t where t.sequence_name = 'S_UID'";
-	private String updateSeqID="update T_PUB_SEQUENCE t set t.next_val = t.next_val +1 where t.sequence_name ='S_UID'";
-	private String getPwdForChekcsql = "select t1.PASS_WORD from T_PUB_USER t,T_PUB_USER_PASSWORD t1 where t.User_Name=? and t1.USER_ID = t.User_ID";
+	private PasswordEncrypt passwordEncrypt; 
+	private String checkPwdsql = "SELECT COUNT(1) NUM FROM T_PUB_USER WHERE USER_NAME=? AND PASSWORD=? ";
+	private String UpdatePwdsql = "UPDATE  T_PUB_USER SET PASSWORD=? ,PASSWORD_CHANGE=? ,NEED_CHANGE_PASS=? WHERE USER_NAME=?";
+	private String getUserIdsql = "SELECT T.USER_ID,(SELECT T.USER_ID FROM  T_PUB_USER_PASSWORD T1 WHERE T1.USER_ID = T.USER_ID)PUSER_ID FROM T_PUB_USER T WHERE T.USER_NAME = ?";
+	private String updateCheckPwdSql ="UPDATE T_PUB_USER_PASSWORD SET PASS_WORD=?,UPDATE_BY=?,UPDATE_TIME=? WHERE USER_ID=?";
+	private String insertUPSql="INSERT INTO T_PUB_USER_PASSWORD (UP_ID,PASS_WORD,USER_ID,INSERT_BY,INSERT_TIME,UPDATE_BY,UPDATE_TIME) VALUES (?,?,?,?,?,?,?)";
+	private String getSeqId = "SELECT T.NEXT_VAL FROM T_PUB_SEQUENCE T WHERE T.SEQUENCE_NAME = 'S_UID'";
+	private String updateSeqID="UPDATE T_PUB_SEQUENCE T SET T.NEXT_VAL = T.NEXT_VAL +1 WHERE T.SEQUENCE_NAME ='S_UID'";
+	private String getPwdForChekcsql = "SELECT T1.PASS_WORD FROM T_PUB_USER T,T_PUB_USER_PASSWORD T1 WHERE T.USER_NAME=? AND T1.USER_ID = T.USER_ID";
 	
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	protected ModelAndView handleRequestInternal(final HttpServletRequest request, final HttpServletResponse response,
 			JdbcUsernamePasswordCredential credential) throws Exception {
 		ModelAndView mav = new ModelAndView("default/ui/casExpiredPassView");
+		
 		final String encryptedOldPassword = passwordEncrypt.encrypt(credential.getUsername(), credential.getOldpassword());
 		credential.setOldpassword(encryptedOldPassword);
 		mav.addObject("credential", credential);
@@ -70,7 +71,9 @@ public class ChangePwdController {
 		credential.setNewpassword(encryptedNewPassword);
 		saveUserMessage(credential);
 		comparePwdSave(credential);
-		mav.setViewName("cas/login");
+		System.out.println("handleRequestInternal**************"+"redirect:"+credential.getLoginUrl());
+		mav = new ModelAndView("redirect:"+credential.getLoginUrl());
+
 		return mav;
 	}
 
@@ -99,7 +102,7 @@ public class ChangePwdController {
 
 	private void saveUserMessage(JdbcUsernamePasswordCredential credential) {
 		
-		jdbcTemplate.update(UpdatePwdsql, new Object[] { credential.getNewpassword(), new Date(), 1, credential.getUsername() });
+		jdbcTemplate.update(UpdatePwdsql, new Object[] { credential.getNewpassword(), new Date(), 0, credential.getUsername() });
 	}
 
 	private boolean comparePwdCheck(JdbcUsernamePasswordCredential credential) throws JsonParseException, JsonMappingException, IOException {

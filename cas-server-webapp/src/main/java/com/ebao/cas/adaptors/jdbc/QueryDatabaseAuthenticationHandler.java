@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -36,11 +37,14 @@ import org.jasig.cas.authentication.AccountDisabledException;
 import org.jasig.cas.authentication.HandlerResult;
 import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.UsernamePasswordCredential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.util.Assert;
 
+import com.ebao.cas.adaptors.rest.QueryRestAuthenticationHandler;
 import com.ebao.cas.encrypt.PasswordEncrypt;
 
 /**
@@ -59,12 +63,17 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 
     @NotNull
     private String sql;
-    private String disableSql="update  T_PUB_USER set STATUS='N' where user_id=?";
-    private String addSql="update  T_PUB_USER set INVALID_LOGIN = INVALID_LOGIN+1 where user_id=?";
-    private String resetSql="update  T_PUB_USER set INVALID_LOGIN = 0 where user_id=?";
-    private String configDay="select para_value from T_PUB_PARA_DEF where para_id = 1178811";
-    private String pwdSql="update  T_PUB_USER set NEED_CHANGE_PASS = ? where user_id=?";
+    private String disableSql="UPDATE  T_PUB_USER SET STATUS='N' WHERE USER_ID=?";
+    private String addSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = INVALID_LOGIN+1 WHERE USER_ID=?";
+    private String resetSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = 0 WHERE USER_ID=?";
+    private String configDay="SELECT PARA_VALUE FROM T_PUB_PARA_DEF WHERE PARA_ID = ?";
+    private String pwdSql="UPDATE  T_PUB_USER SET NEED_CHANGE_PASS = ? WHERE USER_ID=?";
     private PasswordEncrypt passwordEncrypt;
+    private final static Long PASSWORD_CHECK_DAY_DEFUAL = 90L;
+    private final static Long INVALID_LOGIN_TIMES_DEFUAL = 5L;
+    private final static Long PASSWORD_CHECK_DAY_ID = 1178811L;
+    private final static Long INVALID_LOGIN_TIMES_ID = 1178812L;
+    private static final Logger logger = LoggerFactory.getLogger(QueryRestAuthenticationHandler.class);
     /**
      * {@inheritDoc}
      */
@@ -88,24 +97,30 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
             attributes.put("uid", uid);
             attributes.put("client_id", "key");
             if ("N".equals(status) ) {
+            	logger.error("This account has been disabled");
                 throw new AccountDisabledException("This account has been disabled");
             }
-            if(3<= Long.parseLong(invalid)){
+            Long dbconfig = getConfigParaById(INVALID_LOGIN_TIMES_ID)==null?INVALID_LOGIN_TIMES_DEFUAL:getConfigParaById(INVALID_LOGIN_TIMES_ID);
+            if(dbconfig<= Long.parseLong(invalid)){
+            	logger.error("This account has been disabled");
             	disableUser(Long.valueOf(uid));
             	throw new AccountDisabledException("This account has been disabled");
             }
             if (!dbPassword.equals(encryptedPassword)) {
             	addInvalidLogin(Long.valueOf(uid));
+            	logger.error("Password does not match value on record.");
                 throw new FailedLoginException("Password does not match value on record.");
             }
             resetInvalidLogin(Long.valueOf(uid));
             if(!needchangepwd(pwdDate,needFlag,Long.valueOf(uid))){
+            	 logger.error("this account password has been expired");
             	 throw new CredentialExpiredException("this account has been expired");
             }
     		return createHandlerResult(credential, this.principalFactory.createPrincipal(username, attributes),
     				null);
     		
         } catch (final IncorrectResultSizeDataAccessException e) {
+        	logger.error("there has some error",e);
             if (e.getActualSize() == 0) {
                 throw new AccountNotFoundException(username + " not found with SQL query");
             } else {
@@ -113,6 +128,7 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
             }
                  
         } catch (final DataAccessException e) {
+        	logger.error("there has some error",e);
             throw new PreventedException("SQL exception while executing query for " + username, e);
         }
         
@@ -139,14 +155,15 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
     }
     
     public boolean needchangepwd(Date startDate,String neddFlage,Long userId) {
-		if ("0".equals(neddFlage)) {
+		if ("1".equals(neddFlage)) {
 			return false;
 		}
-		Long dbcongig =getJdbcTemplate().queryForObject(configDay,Long.class);
+		Long dbconfig = getConfigParaById(PASSWORD_CHECK_DAY_DEFUAL)==null?PASSWORD_CHECK_DAY_ID:getConfigParaById(PASSWORD_CHECK_DAY_DEFUAL);
+//		Long dbcongig =getJdbcTemplate().queryForObject(configDay,Long.class);
 		if (startDate != null) {
 			double bd = getBetweenDays(startDate, new Date());
-			if (bd > dbcongig) {
-				 getJdbcTemplate().update(pwdSql,new Long[]{0l,userId});
+			if (bd > dbconfig) {
+				 getJdbcTemplate().update(pwdSql,new Long[]{1l,userId});
 				return false;
 			}
 		}
@@ -157,6 +174,16 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 		double result = 0;
 		result = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
 		return result;
+	}
+	private Long getConfigParaById(Long id){
+		List<Map<String, Object>> dbList = getJdbcTemplate().queryForList(configDay, id);
+		Map<String, Object> map = new HashMap<String, Object>();
+		Long dbconfig = null;
+		if(dbList.size()>0){
+			map = dbList.get(0);
+			dbconfig = new Long((String)map.get("para_value"));
+		}
+		return dbconfig;
 	}
 
 	public String getDisableSql() {

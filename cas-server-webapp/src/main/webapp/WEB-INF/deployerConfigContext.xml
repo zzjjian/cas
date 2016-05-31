@@ -136,7 +136,7 @@
 		<property name="testWhileIdle" value="true" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testOnReturn" value="false" />
-		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="validationQuery" value="${validationQuery}" />
 		<property name="validationInterval" value="30000" />
 		<property name="timeBetweenEvictionRunsMillis" value="30000"/>
 		<property name="maxActive" value="100"/>

@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUtils;
 
 /**
  * This controller is in charge of responding to the authorize
@@ -106,7 +107,9 @@ public final class OAuth20AuthorizeController extends AbstractController {
                 .replace("/" + OAuthConstants.AUTHORIZE_URL, "/" + OAuthConstants.CALLBACK_AUTHORIZE_URL);
         LOGGER.debug("{} : {}", OAuthConstants.CALLBACK_AUTHORIZE_URL, callbackAuthorizeUrl);
 
-        final String loginUrlWithService = OAuthUtils.addParameter(loginUrl, OAuthConstants.SERVICE,
+        String fullLoginUrl=request.getRequestURL().toString().replace("/oauth2.0/" + OAuthConstants.AUTHORIZE_URL, "/" + loginUrl);
+        
+        final String loginUrlWithService = OAuthUtils.addParameter(fullLoginUrl, OAuthConstants.SERVICE,
                 callbackAuthorizeUrl);
         LOGGER.debug("loginUrlWithService : {}", loginUrlWithService);
         return OAuthUtils.redirectTo(loginUrlWithService);

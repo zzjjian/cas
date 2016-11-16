@@ -97,6 +97,14 @@
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/changePwd/*</url-pattern>
     </filter-mapping> 
+ <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/resetPwd</url-pattern>
+    </filter-mapping> 
+ <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/resetPwd/*</url-pattern>
+    </filter-mapping> 
 
 
     <!--
@@ -266,6 +274,16 @@
     <servlet-mapping>
         <servlet-name>cas</servlet-name>
         <url-pattern>/changePwd/check</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>cas</servlet-name>
+        <url-pattern>/resetPwd</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>cas</servlet-name>
+        <url-pattern>/resetPwd/save</url-pattern>
     </servlet-mapping>
 
 

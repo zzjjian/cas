@@ -365,4 +365,32 @@
 <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>     -->
 <!--Spring3.1开始的注解 HandlerAdapter -->    
 <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>    -->
+
+	<bean id="resetPasswordNotify" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg index="0" value="resetPasswordNotifyQueue" />
+    </bean>
+    
+    <!-- config connectionFactory -->
+	<bean id="clientJmsConnection" class="org.apache.activemq.ActiveMQConnectionFactory">
+			<property name="brokerURL" value="${ACTIVE_MQ_URL}" />
+		</bean>
+		
+		<bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+			<property name="connectionFactory">
+				<ref bean="clientJmsConnection"></ref>
+			</property>
+			<property name="maxConnections">
+				<value>${client.maxConnections}</value>
+			</property>
+			<property name="idleTimeout">
+				<value>${client.idleTimeout}</value>
+			</property>
+			<property name="maximumActiveSessionPerConnection">
+				<value>${client.maximumActive}</value>
+			</property>
+		</bean>
+		
+		<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+			<property name="connectionFactory" ref="connectionFactory"></property>
+		</bean>
 </beans>

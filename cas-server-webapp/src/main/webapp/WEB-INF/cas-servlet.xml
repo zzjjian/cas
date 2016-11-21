@@ -367,7 +367,7 @@
 <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>    -->
 
 	<bean id="resetPasswordNotify" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg index="0" value="resetPasswordNotifyQueue" />
+        <constructor-arg index="0" value="${email_queue}" />
     </bean>
     
     <!-- config connectionFactory -->

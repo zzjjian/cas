@@ -201,6 +201,9 @@ public class ResetPwdController {
 		final String integrationPoint = "resetPasswordNotify";
 		final String correlationId = UUID.randomUUID().toString();
 		
+		final String userName = (String)map.get("USER_NAME");
+		final Long userId = Long.valueOf(String.valueOf(map.get("USER_ID")));
+		
 		//get jmsTemplate
 		JmsTemplate jmsTemplate = null;
 		jmsTemplate = new JmsTemplate(connectionFactory);
@@ -213,8 +216,22 @@ public class ResetPwdController {
 				public Object doInJms(Session session, MessageProducer producer) throws JMSException {
 
 					ObjectMessage message = session.createObjectMessage();
+					
+					//add mock data for send mail
+					message.setLongProperty("userId", userId);
+					message.setStringProperty("userName", userName);
+					Map<String, Object> ciMap = new HashMap<String, Object>();
+					ciMap.put("SourceSystemId", new Integer(1));
+					ciMap.put("CommandUUID", UUID.randomUUID().toString());
+					ciMap.put("GlobalTransactionId",3216544L);
+					ciMap.put("TransactionType", 1L);
+					ciMap.put("NeedResponse", "N");
+					ciMap.put("SourceSystemBaseURL", "fff");
+					message.setObjectProperty("ci", ciMap);
+					
 					message.setJMSCorrelationID(correlationId);
 					message.setObject(wrap.toHashMap());
+					
 					/*try {
 						fireSendEvent(message);
 					} catch (ClientException e) {

@@ -49,6 +49,12 @@
 			<artifactId>cas-server-support-rest</artifactId>
 			<version>4.1.1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.jasig.cas</groupId>
+			<artifactId>cas-server-support-ldap</artifactId>
+			<version>4.1.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jasig.cas</groupId>

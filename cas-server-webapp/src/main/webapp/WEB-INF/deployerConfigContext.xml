@@ -55,6 +55,7 @@
         <constructor-arg>
 		<list>
 			<ref bean="primaryAuthenticationHandler"/>
+			<ref bean="ldapAuthenticationHandler"/>
 		</list>
         </constructor-arg>
 
@@ -95,17 +96,100 @@
        | * org.jasig.cas.adaptors.x509.authentication.handler.support.X509CredentialsAuthenticationHandler
        | * org.jasig.cas.support.spnego.authentication.handler.support.JCIFSSpnegoAuthenticationHandler
        -->
-<!--       
+<!--      
     <bean id="primaryAuthenticationHandler"
           class="org.jasig.cas.authentication.AcceptUsersAuthenticationHandler">
         <property name="users">
             <map>
                 <entry key="andy" value="eBao1234"/>
-		<entry key="demo" value="eBao1234"/>
-            </map>
+				<entry key="demo" value="eBao1234"/>
+			</map>
         </property>
     </bean>
 -->
+    
+	<!-- ldap start  -->
+	<bean id="ldapAuthenticationHandler" 
+		class="org.jasig.cas.authentication.LdapAuthenticationHandler" 
+		c:authenticator-ref="authenticator">
+			<property name="principalAttributeMap">
+				<map>
+					<entry key="client_id" value="key"/>
+				</map>
+			</property>
+		</bean>
+		
+		<bean id="authenticator" 
+		class="org.ldaptive.auth.Authenticator" 
+		c:resolver-ref="dnResolver" 
+		c:handler-ref="authHandler"	
+		p:entryResolver-ref="entryResolver">
+			<property name="authenticationResponseHandlers">
+				<list>
+					<bean class="org.ldaptive.auth.ext.ActiveDirectoryAuthenticationResponseHandler" />
+				</list>
+			</property>
+		</bean>
+		
+		<!-- Active Directory UPN format. -->
+		<bean id="dnResolver"
+			class="org.ldaptive.auth.FormatDnResolver"
+			c:format="%s@${ldap.domain}" />
+		
+		<bean id="authHandler" class="org.ldaptive.auth.PooledBindAuthenticationHandler"
+			p:connectionFactory-ref="pooledLdapConnectionFactory" />
+		
+		<bean id="pooledLdapConnectionFactory"
+			class="org.ldaptive.pool.PooledConnectionFactory"
+			p:connectionPool-ref="connectionPool" />
+		
+		<bean id="connectionPool"
+			class="org.ldaptive.pool.BlockingConnectionPool"
+			init-method="initialize"
+			p:poolConfig-ref="ldapPoolConfig"
+			p:blockWaitTime="${ldap.pool.blockWaitTime}"
+			p:validator-ref="searchValidator"
+			p:pruneStrategy-ref="pruneStrategy"
+			p:connectionFactory-ref="connectionFactory" />
+		
+		<bean id="ldapPoolConfig" class="org.ldaptive.pool.PoolConfig"
+			p:minPoolSize="${ldap.pool.minSize}"
+			p:maxPoolSize="${ldap.pool.maxSize}"
+			p:validateOnCheckOut="${ldap.pool.validateOnCheckout}"
+			p:validatePeriodically="${ldap.pool.validatePeriodically}"
+			p:validatePeriod="${ldap.pool.validatePeriod}" />
+		
+		<bean id="connectionFactory" class="org.ldaptive.DefaultConnectionFactory"
+			p:connectionConfig-ref="connectionConfig" />
+		
+		<bean id="connectionConfig" class="org.ldaptive.ConnectionConfig"
+			p:ldapUrl="${ldap.url}"
+			p:connectTimeout="${ldap.connectTimeout}"
+			p:useStartTLS="${ldap.useStartTLS}"/>
+		<!--	p:sslConfig-ref="sslConfig"/>
+		
+		<bean id="sslConfig" class="org.ldaptive.ssl.SslConfig">
+			<property name="credentialConfig">
+				<bean class="org.ldaptive.ssl.X509CredentialConfig"
+					p:trustCertificates="${ldap.trustedCert}" />
+			</property>
+		</bean>
+		-->
+		
+		<bean id="pruneStrategy" class="org.ldaptive.pool.IdlePruneStrategy"
+			p:prunePeriod="${ldap.pool.prunePeriod}"
+			p:idleTime="${ldap.pool.idleTime}" />
+		
+		<bean id="searchValidator" class="org.ldaptive.pool.SearchValidator" />
+		
+		<!-- If you wish to search by user, rather than by dn, change {dn} to {user} -->
+		<bean id="entryResolver"
+			class="org.ldaptive.auth.SearchEntryResolver"
+			p:baseDn="${ldap.authn.baseDn}"
+			p:userFilter="userPrincipalName={user}"
+			p:subtreeSearch="true" />
+		
+		<!-- ldap over -->
 <!-- 
 	<bean id="primaryAuthenticationHandler" class="org.jasig.cas.adaptors.jdbc.QueryRestAuthenticationHandler">
 		<property name="requestUrl" value="@pa_login_url@"/>

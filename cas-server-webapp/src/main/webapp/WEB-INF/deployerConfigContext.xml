@@ -54,8 +54,8 @@
     <bean id="authenticationManager" class="org.jasig.cas.authentication.PolicyBasedAuthenticationManager">
         <constructor-arg>
 		<list>
-			<ref bean="primaryAuthenticationHandler"/>
 			<ref bean="ldapAuthenticationHandler"/>
+			<ref bean="primaryAuthenticationHandler"/>
 		</list>
         </constructor-arg>
 

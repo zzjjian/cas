@@ -270,6 +270,7 @@ public class LdapAuthenticationHandler extends AbstractUsernamePasswordAuthentic
                 }
             }
         }
+        attributeMap.put("client_id", "key");
         return this.principalFactory.createPrincipal(id, attributeMap);
     }
 

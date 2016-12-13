@@ -19,7 +19,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
+<script src="<%=request.getContextPath()%>/js/head.min.js"></script>
 </div> 
 
 <footer>

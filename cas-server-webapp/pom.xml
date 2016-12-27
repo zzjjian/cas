@@ -151,24 +151,6 @@
 			<version>3.2.1.RELEASE</version>
 		</dependency>
 	</dependencies>
-	
-	<profiles>  
-        <profile>  
-            <id>jdbc</id>  
-            <activation>  
-                <activeByDefault>true</activeByDefault>  
-            </activation>  
-            <properties>  
-                <profiles.activation>jdbc</profiles.activation>  
-            </properties>  
-        </profile>  
-        <profile>  
-            <id>ldap</id>  
-            <properties>  
-                <profiles.activation>ldap</profiles.activation>  
-            </properties>  
-        </profile>  
-	</profiles>  
 
 	<build>
 		<plugins>

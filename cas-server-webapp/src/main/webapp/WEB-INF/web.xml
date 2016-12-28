@@ -259,6 +259,10 @@
         <servlet-name>cas</servlet-name>
         <url-pattern>/v1/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>cas</servlet-name>
+        <url-pattern>/ebao/*</url-pattern>
+    </servlet-mapping>
 
 
     <servlet-mapping>

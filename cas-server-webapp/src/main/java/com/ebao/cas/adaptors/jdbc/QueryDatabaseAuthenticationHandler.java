@@ -19,30 +19,25 @@
 package com.ebao.cas.adaptors.jdbc;
 
 import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.AccountNotFoundException;
 import javax.security.auth.login.CredentialExpiredException;
 import javax.security.auth.login.FailedLoginException;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jasig.cas.adaptors.jdbc.AbstractJdbcUsernamePasswordAuthenticationHandler;
-import org.jasig.cas.authentication.AccountDisabledException;
 import org.jasig.cas.authentication.HandlerResult;
 import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.UsernamePasswordCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.util.Assert;
 
 import com.ebao.cas.adaptors.rest.QueryRestAuthenticationHandler;
 import com.ebao.cas.encrypt.PasswordEncrypt;
@@ -98,13 +93,13 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
             attributes.put("client_id", "key");
             if ("N".equals(status) ) {
             	logger.error("This account has been disabled");
-                throw new AccountDisabledException("This account has been disabled");
+                throw new AccountLockedException("This account has been locked");
             }
             Long dbconfig = getConfigParaById(INVALID_LOGIN_TIMES_ID)==null?INVALID_LOGIN_TIMES_DEFUAL:getConfigParaById(INVALID_LOGIN_TIMES_ID);
             if(dbconfig<= Long.parseLong(invalid)){
             	logger.error("This account has been disabled");
             	disableUser(Long.valueOf(uid));
-            	throw new AccountDisabledException("This account has been disabled");
+            	throw new AccountLockedException("This account has been locked");
             }
             if (!dbPassword.equals(encryptedPassword)) {
             	addInvalidLogin(Long.valueOf(uid));

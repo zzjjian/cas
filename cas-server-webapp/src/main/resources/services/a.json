@@ -2,7 +2,7 @@
      "@class" : "org.jasig.cas.services.RegexRegisteredService",
      "id" : 103935657744185,
      "description" : "This is the application description",
-     "serviceId" : "^(https|http)://@DOMAIN_NAME@.+",
+     "serviceId" : "@DOMAIN_NAME@",
      "name" : "testSaveAttributeReleasePolicyAllowedAttrRulesAndFilter",
      "theme" : "testtheme",
      "proxyPolicy" : {

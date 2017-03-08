@@ -3,7 +3,7 @@
 		"id" : "1",
 		"name" : "serviceName", 
 		"description" : "Service Description", 
-		"serviceId" : "^(https|http)://@DOMAIN_NAME@.+",
+		"serviceId" : "@DOMAIN_NAME@",
 		"bypassApprovalPrompt" : "true", 
 		"clientId" : "key",
 		"clientSecret" : "secret"

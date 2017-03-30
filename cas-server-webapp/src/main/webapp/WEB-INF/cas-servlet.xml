@@ -357,8 +357,9 @@
   -->
   <bean
   id="oauth20WrapperController"
-  class="org.jasig.cas.support.oauth.web.OAuth20WrapperController"
+  class="com.ebao.cas.controller.EbaoOAuth20WrapperController"
   p:loginUrl="@CAS_LOGIN_URL@"
+  p:redirectUrl="${redirect.url}"
   p:servicesManager-ref="servicesManager"
   p:ticketRegistry-ref="ticketRegistry"
   p:timeout="7200" />

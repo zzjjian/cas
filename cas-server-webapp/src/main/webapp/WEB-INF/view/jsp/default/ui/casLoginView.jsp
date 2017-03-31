@@ -126,7 +126,7 @@
             <input class="btn-submit" name="submit" accesskey="l" value="<spring:message code="screen.welcome.button.login" />" tabindex="6" type="submit" />
             <input class="btn-reset" name="reset" accesskey="c" value="<spring:message code="screen.welcome.button.clear" />" tabindex="7" type="reset" />
 
-            <a href="<%=request.getContextPath() + "/resetPwd"%>">Forget Password?</a>
+            <a href="<%=request.getContextPath() + "/resetPwd"%>">Forgot Password?</a>
         </section>
         <form:errors path="*" id="msg" cssClass="errors" element="div" htmlEscape="false" />
     </form:form>

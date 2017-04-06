@@ -40,4 +40,16 @@ public class EbaoTicketsResource {
     protected Credential obtainCredential(final MultiValueMap<String, String> requestBody) {
         return new UsernamePasswordCredential(requestBody.getFirst("username"), requestBody.getFirst("password"));
     }
+    
+    @RequestMapping(value = "/v1/json/tickets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Produces({"application/json"}) 
+    public final TokenEntity createTicketForRainbow(@RequestBody UsernamePasswordCredential cre) {
+        try{
+            final TicketGrantingTicket tgtId = this.cas.createTicketGrantingTicket(cre);
+            return new TokenEntity(tgtId.getId());
+        } catch (final Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            return new TokenEntity(null);
+        }
+    }
 }

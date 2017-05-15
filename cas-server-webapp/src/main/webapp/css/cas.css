@@ -43,9 +43,9 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; marg
 input, select { vertical-align: middle; }
 body { font-family: Verdana, sans-serif; font-size: 11px; line-height: 1.4em; background: #eee; }
 
-#container { width: 960px; margin: 0 auto; }
+#container { width: 100%; margin: 0 auto; }
 
-@media only screen and (max-width: 960px) {
+@media only screen and (max-width: 100%) {
     #container { width: 100%; }
     #content {
         -webkit-border-bottom-right-radius: 0px;
@@ -55,10 +55,14 @@ body { font-family: Verdana, sans-serif; font-size: 11px; line-height: 1.4em; ba
         border-bottom-right-radius: 0px;
         border-bottom-left-radius: 0px;
     }
+    #topTitle {
+    	width:100%;
+    }
 }
 
 body {
     background: #2196f3; /* Old browsers */
+    background: url(../images/background.png) no-repeat;
 }
 
 a:link, a:visited {
@@ -104,6 +108,10 @@ header h1 {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
+    width:260px;
+    float:right;
+    margin-right:100px;
+    margin-top:60px;
 }
 
 #msg {
@@ -235,7 +243,7 @@ footer a:link, footer a:visited {
     color: white;
 }
 
-@media only screen and (max-width: 960px) {
+@media only screen and (max-width: 100%) {
     header { padding: 20px; }
     #container { width: 100%; }
     #content {
@@ -255,5 +263,33 @@ footer a:link, footer a:visited {
     #fm1 .row .btn-reset { display: none; }
     #sidebar { margin-top: 20px; }
     #sidebar .sidebar-content { padding: 0; }
+}
+
+#ebaocloudlogo {
+	width:260px;
+	text-align: center;
+}
+
+#login h3 {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	width:260px;
+	text-align: center;
+}
+
+#forgotPwd {
+	width:260px;
+}
+
+#topTitle {
+    height:60px;
+    background:#fff;
+}
+
+#topTitle1 {
+	font-size:24px;
+	width:300px;
+	padding-left:100px;
+	padding-top:20px;
 }
 

@@ -74,8 +74,8 @@
 <!--
         <h2><spring:message code="screen.welcome.instructions" /></h2>
 -->
-				<img src="./images/Slogo.png" />
-
+				<div id="ebaocloudlogo"><img src="./images/ebaocloudlogo.png" /></div>
+		<h3>eBaoCloud Platform</h3>
         <section class="row">
             <label for="username"><spring:message code="screen.welcome.label.netid" /></label>
             <c:choose>
@@ -126,20 +126,12 @@
             <input class="btn-submit" name="submit" accesskey="l" value="<spring:message code="screen.welcome.button.login" />" tabindex="6" type="submit" />
             <input class="btn-reset" name="reset" accesskey="c" value="<spring:message code="screen.welcome.button.clear" />" tabindex="7" type="reset" />
 
-            <a href="<%=request.getContextPath() + "/resetPwd"%>">Forgot Password?</a>
+            <div id="forgotPwd"><a href="<%=request.getContextPath() + "/resetPwd"%>">Forgot Password?</a></div>
         </section>
         <form:errors path="*" id="msg" cssClass="errors" element="div" htmlEscape="false" />
     </form:form>
 </div>
-<div id="sidebar">
-    <div class="sidebar-content">
-			
 
-		<img src="./images/ebaotech_Client_background.png" />
-
-		
-    </div>
-</div>
 
 
 <!--

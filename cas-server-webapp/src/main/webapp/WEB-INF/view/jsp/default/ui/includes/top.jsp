@@ -43,6 +43,7 @@
   <![endif]-->
 </head>
 <body id="cas">
+  <div id="topTitle"><div id="topTitle1">eBaoCloud Platform</div></div>
   <div id="container">
   	
       <header>
@@ -53,5 +54,4 @@
         <h1>Central Authentication Service (CAS)</h1>
       	-->
       </header>
-      
       <div id="content">

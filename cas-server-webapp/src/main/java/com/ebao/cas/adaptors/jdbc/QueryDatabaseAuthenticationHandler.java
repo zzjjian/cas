@@ -19,6 +19,7 @@
 package com.ebao.cas.adaptors.jdbc;
 
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.Map;
 
 import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.AccountNotFoundException;
-import javax.security.auth.login.CredentialExpiredException;
 import javax.security.auth.login.FailedLoginException;
 import javax.validation.constraints.NotNull;
 
@@ -41,6 +41,8 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 import com.ebao.cas.adaptors.rest.QueryRestAuthenticationHandler;
 import com.ebao.cas.encrypt.PasswordEncrypt;
+import com.ebao.cas.util.Hex;
+import com.ebao.cas.util.Utf8;
 
 /**
  * Class that if provided a query that returns a password (parameter of query
@@ -60,9 +62,12 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
     private String sql;
     private String disableSql="UPDATE  T_PUB_USER SET STATUS='N' WHERE USER_ID=?";
     private String addSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = INVALID_LOGIN+1 WHERE USER_ID=?";
-    private String resetSql="UPDATE  T_PUB_USER SET INVALID_LOGIN = 0 WHERE USER_ID=?";
     private String configDay="SELECT PARA_VALUE FROM T_PUB_PARA_DEF WHERE PARA_ID = ?";
     private String pwdSql="UPDATE  T_PUB_USER SET NEED_CHANGE_PASS = ? WHERE USER_ID=?";
+    
+    private String getpwdSql="SELECT PASSWORD FROM T_MAF_ACCOUNT_SECURE WHERE ACCOUNT_ID=?";
+    private String failTimesSql="SELECT FAIL_RETRY_TIMES FROM T_MAF_ACCOUNT_SYSTEM WHERE ACCOUNT_ID=?";
+    private String resetSql="UPDATE  T_MAF_ACCOUNT_SYSTEM SET FAIL_RETRY_TIMES = 0 WHERE ACCOUNT_ID=?";
     private PasswordEncrypt passwordEncrypt;
     private final static Long PASSWORD_CHECK_DAY_DEFUAL = 90L;
     private final static Long INVALID_LOGIN_TIMES_DEFUAL = 5L;
@@ -78,39 +83,59 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 
         final String username = credential.getUsername();
 //      final String encryptedPassword = this.getPasswordEncoder().encode(credential.getPassword());
-        final String encryptedPassword = passwordEncrypt.encrypt(credential.getUsername(), credential.getPassword());
+        //final String encryptedPassword = passwordEncrypt.encrypt(credential.getUsername(), credential.getPassword());
         try {
  //         final String dbPassword = getJdbcTemplate().queryForObject(this.sql, String.class, username);
             final Map<String, Object> values = getJdbcTemplate().queryForMap(this.sql, username);
-            final String dbPassword= (String)values.get("PASSWORD");
-            final String uid=String.valueOf(values.get("USER_ID"));
-            final String status=String.valueOf(values.get("STATUS"));
-            final String invalid=String.valueOf(values.get("INVALID_LOGIN"));
-            final String needFlag=String.valueOf(values.get("NEED_CHANGE_PASS"));
-            final Date pwdDate = (Date) values.get("PASSWORD_CHANGE");
+            //final String dbPassword= (String)values.get("PASSWORD");
+            final String uid=String.valueOf(values.get("ACCOUNT_ID"));
+            final Boolean status=((Integer.valueOf(String.valueOf(values.get("ENABLED"))))==1);
+            //final String invalid=String.valueOf(values.get("INVALID_LOGIN"));
+            //final String needFlag=String.valueOf(values.get("NEED_CHANGE_PASS"));
+            //final Date pwdDate = (Date) values.get("PASSWORD_CHANGE");
             Map<String, Object> attributes = new HashMap<String, Object>();
             attributes.put("uid", uid);
             attributes.put("client_id", "key");
-            if ("N".equals(status) ) {
+            if (status == false) {
             	logger.error("This account has been disabled");
                 throw new AccountLockedException("This account has been locked");
             }
-            Long dbconfig = getConfigParaById(INVALID_LOGIN_TIMES_ID)==null?INVALID_LOGIN_TIMES_DEFUAL:getConfigParaById(INVALID_LOGIN_TIMES_ID);
+            /*Long dbconfig = getConfigParaById(INVALID_LOGIN_TIMES_ID)==null?INVALID_LOGIN_TIMES_DEFUAL:getConfigParaById(INVALID_LOGIN_TIMES_ID);
             if(dbconfig<= Long.parseLong(invalid)){
             	logger.error("This account has been disabled");
             	disableUser(Long.valueOf(uid));
             	throw new AccountLockedException("This account has been locked");
-            }
-            if (!dbPassword.equals(encryptedPassword)) {
-            	addInvalidLogin(Long.valueOf(uid));
+            }*/
+            //****************password check********************
+            String saltedPass = credential.getPassword() + "{" + credential.getUsername() + "}";
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+
+    		byte[] digest = messageDigest.digest(Utf8.encode(saltedPass));
+    		String encodePwd = new String(Hex.encode(digest));
+    		System.out.println(encodePwd);
+    		
+            final Map<String, Object> pwdValues = getJdbcTemplate().queryForMap(this.getpwdSql, uid);
+            final String dbPassword= (String)pwdValues.get("PASSWORD");
+            if (!dbPassword.equals(encodePwd)) {
+            	//addInvalidLogin(Long.valueOf(uid));
             	logger.error("Password does not match value on record.");
                 throw new FailedLoginException("Password does not match value on record.");
             }
-            resetInvalidLogin(Long.valueOf(uid));
-            if(!needchangepwd(pwdDate,needFlag,Long.valueOf(uid))){
+            
+            //****************fail entry times check***************
+            /*final Map<String, Object> failTimesValues = getJdbcTemplate().queryForMap(this.failTimesSql, uid);
+            Long failTimes = Long.valueOf(String.valueOf(failTimesValues.get("FAIL_RETRY_TIMES")));
+            if(this.INVALID_LOGIN_TIMES_DEFUAL <= failTimes){
+            	logger.error("This account has been disabled");
+            	disableUser(Long.valueOf(uid));
+            	throw new AccountLockedException("This account has been locked");
+            }*/
+            
+            //resetInvalidLogin(Long.valueOf(uid));
+            /*if(!needchangepwd(pwdDate,needFlag,Long.valueOf(uid))){
             	 logger.error("this account password has been expired");
             	 throw new CredentialExpiredException("this account has been expired");
-            }
+            }*/
     		return createHandlerResult(credential, this.principalFactory.createPrincipal(username, attributes),
     				null);
     		

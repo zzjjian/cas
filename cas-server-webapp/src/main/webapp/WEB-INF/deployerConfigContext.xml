@@ -38,7 +38,7 @@
 	<bean id="primaryAuthenticationHandler"
 		class="com.ebao.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">
 		<property name="sql"
-			value="select PASSWORD,USER_ID,STATUS,USER_DISABLE,NEED_CHANGE_PASS,PASSWORD_CHANGE,INVALID_LOGIN from T_PUB_USER where USER_NAME=?" />
+			value="select ACCOUNT_ID,ENABLED from T_MAF_ACCOUNT where ACCOUNT_NAME=?" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="passwordEncrypt" ref="passwordEncrypt" />
 	</bean>
